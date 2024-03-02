@@ -27,15 +27,13 @@ const fetchStats = async (players, teamInfo) => {
     data.teamLogo = teamInfo.teamLogo;
     const values = statsTable.find(".StatBlockInner");
 
-    if (data.position != Position.Pitchers) {
-      values.each((i, el) => {
-        const stat = $(el).find(".StatBlockInner__Label").text();
-        const value = $(el).find(".StatBlockInner__Value").text();
-        if (stat) {
-          data[stat] = value;
-        }
-      });
-    }
+    values.each((i, el) => {
+      const stat = $(el).find(".StatBlockInner__Label").text();
+      const value = $(el).find(".StatBlockInner__Value").text();
+      if (stat) {
+        data[stat] = value;
+      }
+    });
 
     athletes.athletes.push(data);
     fs.writeFileSync("athletes.json", JSON.stringify(athletes, null, 2));
