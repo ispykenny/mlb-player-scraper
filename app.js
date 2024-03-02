@@ -5,6 +5,13 @@ const athletes = require("./athletes.json");
 const TEAM_LIMIT = 31; // 30 teams with offset of 1
 let count = 1; // offset (api starts at 1)
 
+const Position = {
+  Pitchers: "Pitchers",
+  Outfielders: "Outfielders",
+  Infielders: "Infielders",
+  Catchers: "Catchers",
+};
+
 const fetchStats = async (players, teamInfo) => {
   players.forEach(async (player) => {
     const response = await axios(player.links[0].href);
@@ -20,13 +27,15 @@ const fetchStats = async (players, teamInfo) => {
     data.teamLogo = teamInfo.teamLogo;
     const values = statsTable.find(".StatBlockInner");
 
-    values.each((i, el) => {
-      const stat = $(el).find(".StatBlockInner__Label").text();
-      const value = $(el).find(".StatBlockInner__Value").text();
-      if (stat) {
-        data[stat] = value;
-      }
-    });
+    if (data.position != Position.Pitchers) {
+      values.each((i, el) => {
+        const stat = $(el).find(".StatBlockInner__Label").text();
+        const value = $(el).find(".StatBlockInner__Value").text();
+        if (stat) {
+          data[stat] = value;
+        }
+      });
+    }
 
     athletes.athletes.push(data);
     fs.writeFileSync("athletes.json", JSON.stringify(athletes, null, 2));
@@ -47,7 +56,12 @@ const fetchRoster = async () => {
   );
   const data = await response.data;
   const players = await data.athletes;
-  const positionsToFetch = ["Outfielders", "Infielders", "Catchers"];
+  const positionsToFetch = [
+    Position.Pitchers,
+    Position.Outfielders,
+    Position.Infielders,
+    Position.Catchers,
+  ];
 
   players.map((player) => {
     if (positionsToFetch.includes(player.position)) {
